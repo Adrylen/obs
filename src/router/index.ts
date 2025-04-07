@@ -1,5 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '../views/HomeView.vue';
+import AchievementPage from '../views/overlay/steam-achievements/AchievementPage.vue';
 
 const router = createRouter({
   history: createWebHistory('/obs/'),
@@ -12,7 +13,7 @@ const router = createRouter({
     {
       path: '/overlay/steam-achievements',
       name: 'overlay-steam-achievements',
-      component: () => import('../views/overlay/steam-achievements/AchievementPage.vue'),
+      component: AchievementPage,
     },
   ],
 })
