@@ -11,10 +11,10 @@ const debug = ref<boolean>(route.query.debug === "true");
 const otherId = ref(route.query.otherId ?? undefined);
 const otherName = ref<string | undefined>(route.query.otherName as string ?? undefined);
 
-const game = ref<SteamGameResponse | undefined>(undefined);
-const response = ref<SteamPlayerStatsResponse | undefined>(undefined);
-const stats = ref<SteamPlayerStatsResponse | undefined>(undefined);
-const otherStats = ref<SteamPlayerStatsResponse | undefined>(undefined);
+const game = ref<SteamGameResponse>(undefined);
+const response = ref<SteamPlayerStatsResponse>(undefined);
+const stats = ref<SteamPlayerStatsResponse>(undefined);
+const otherStats = ref<SteamPlayerStatsResponse>(undefined);
 
 const queryParameters = (override: object = {}) => Object
   .entries({
@@ -54,18 +54,18 @@ const playerAchievements = computed(() => !loaded.value ? [] : game.value?.game
   }, []) ?? []
 );
 
-$fetch<SteamPlayerStatsResponse | undefined>(`/api/steam/player/achievements?${queryParameters()}`)
+$fetch<SteamPlayerStatsResponse>(`/api/steam/player/achievements?${queryParameters()}`)
   .then((res) => response.value = res)
   .catch(()=>{});
-$fetch<SteamPlayerStatsResponse | undefined>(`/api/steam/player/stats?${queryParameters()}`)
+$fetch<SteamPlayerStatsResponse>(`/api/steam/player/stats?${queryParameters()}`)
   .then((res) => stats.value = res)
   .catch(()=>{});
-$fetch<SteamGameResponse | undefined>(`/api/steam/game/schema?${queryParameters()}`)
+$fetch<SteamGameResponse>(`/api/steam/game/schema?${queryParameters()}`)
   .then((res) => game.value = res)
   .catch(()=>{});
 
 if (!!otherId) {
-  $fetch<SteamPlayerStatsResponse | undefined>(`/api/steam/player/achievements?${queryParameters({ steamId: otherId.value })}`)
+  $fetch<SteamPlayerStatsResponse>(`/api/steam/player/achievements?${queryParameters({ steamId: otherId.value })}`)
   .then((res) => otherStats.value = res)
   .catch(()=>{});
 }
@@ -73,7 +73,7 @@ if (!!otherId) {
 onMounted(() => {
   setInterval(() => {
     displayed.value = (displayed.value + 1) % (playerAchievements.value.length || 1);
-  }, 3000);
+  }, +(route.query.t ?? 0) || 10000);
 });
 </script>
 

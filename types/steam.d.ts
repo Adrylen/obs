@@ -24,7 +24,7 @@ export type SteamGameResponse = {
       }>;
     };
   };
-};
+} | undefined;
 
 export type SteamPlayerStatsResponse = {
   playerstats: {
@@ -38,4 +38,4 @@ export type SteamPlayerStatsResponse = {
       value: number;
     }>;
   };
-};
+} | undefined;
