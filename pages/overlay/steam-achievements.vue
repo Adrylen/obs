@@ -1,25 +1,34 @@
 <script setup lang="ts">
 import type { Achievement } from '@/types/achievements';
 import type { SteamGameResponse, SteamPlayerStatsResponse } from '@/types/steam';
-import { ref, onMounted, computed } from 'vue';
 import AchievementTotal from '@/components/steam-achievements/AchievementTotal.vue';
-import AchievementParameters from '@/components/steam-achievements/AchievementParameters.vue';
 import AchievementElement from '@/components/steam-achievements/AchievementElement.vue';
-import { getGameSchema, getPlayerAchievements, getUserGameStats } from '@/api/steam';
 
-const errors = ref<string[]>([]);
-const otherId = ref<string | undefined>(undefined);
-const otherName = ref<string | undefined>(undefined);
+const route = useRoute();
 
-const debug = ref<boolean>(false);
 const displayed = ref<number>(0);
+const debug = ref<boolean>(route.query.debug === "true");
+const otherId = ref(route.query.otherId ?? undefined);
+const otherName = ref<string | undefined>(route.query.otherName as string ?? undefined);
 
-const response = ref<SteamPlayerStatsResponse | undefined>(undefined);
 const game = ref<SteamGameResponse | undefined>(undefined);
+const response = ref<SteamPlayerStatsResponse | undefined>(undefined);
 const stats = ref<SteamPlayerStatsResponse | undefined>(undefined);
 const otherStats = ref<SteamPlayerStatsResponse | undefined>(undefined);
 
-const loaded = computed(() => !!response.value && !!game.value);
+const queryParameters = (override: object = {}) => Object
+  .entries({
+    appId: route.query.appId ?? route.query.appid,
+    key: route.query.key,
+    lang: route.query.lang ?? route.query.l,
+    steamId: route.query.steamId ?? route.query.steamid,
+    ...override,
+  })
+  .filter(([_, value]) => !!value)
+  .map(([key, value]) => `${key}=${value}`)
+  .join('&');
+
+const loaded = computed(() => !!response.value && !!stats.value && !!game.value);
 
 const playerAchievements = computed(() => !loaded.value ? [] : game.value?.game
   .availableGameStats.achievements
@@ -45,42 +54,30 @@ const playerAchievements = computed(() => !loaded.value ? [] : game.value?.game
   }, []) ?? []
 );
 
-onMounted(async () => {
-  const params = new URLSearchParams(location.search);
+$fetch<SteamPlayerStatsResponse | undefined>(`/api/steam/player/achievements?${queryParameters()}`)
+  .then((res) => response.value = res)
+  .catch(()=>{});
+$fetch<SteamPlayerStatsResponse | undefined>(`/api/steam/player/stats?${queryParameters()}`)
+  .then((res) => stats.value = res)
+  .catch(()=>{});
+$fetch<SteamGameResponse | undefined>(`/api/steam/game/schema?${queryParameters()}`)
+  .then((res) => game.value = res)
+  .catch(()=>{});
 
-  // Mandatory parameters
-  const key = params.get('key');
-  if (!key) errors.value.push('key');
-  const appId = params.get('appId');
-  if (!appId) errors.value.push('appId');
-  const steamId = params.get('steamId');
-  if (!steamId) errors.value.push('steamId');
+if (!!otherId) {
+  $fetch<SteamPlayerStatsResponse | undefined>(`/api/steam/player/achievements?${queryParameters({ steamId: otherId.value })}`)
+  .then((res) => otherStats.value = res)
+  .catch(()=>{});
+}
 
-  if (!key || !appId || !steamId) return;
-
-  // Optional parameters
-  const lang = 'french';
-  otherId.value = params.get('otherId') ?? undefined;
-  otherName.value = params.get('otherName') ?? undefined;
-  debug.value = params.get('debug') === "true";
-
-  // API calls
-  response.value = await getPlayerAchievements({ appId, key, steamId, lang });
-  game.value = await getGameSchema({ appId, key, lang });
-  stats.value = await getUserGameStats({ appId, key, steamId });
-
-  if (otherId.value)
-    otherStats.value = await getPlayerAchievements({ appId, key, steamId: otherId.value, lang });
-
-  // Loop
-  setInterval(() => {
-    displayed.value = (displayed.value + 1) % (playerAchievements.value.length || 1);
-  }, 3000);
-});
+  onMounted(() => {
+    setInterval(() => {
+      displayed.value = (displayed.value + 1) % (playerAchievements.value.length || 1);
+    }, 3000);
+  })
 </script>
 
 <template>
-  <AchievementParameters v-if="errors.length" :errors />
   <section v-if="loaded" class="achievements">
     <AchievementTotal :data="response" />
     <AchievementTotal
