@@ -70,11 +70,11 @@ if (!!otherId) {
   .catch(()=>{});
 }
 
-  onMounted(() => {
-    setInterval(() => {
-      displayed.value = (displayed.value + 1) % (playerAchievements.value.length || 1);
-    }, 3000);
-  })
+onMounted(() => {
+  setInterval(() => {
+    displayed.value = (displayed.value + 1) % (playerAchievements.value.length || 1);
+  }, 3000);
+});
 </script>
 
 <template>
