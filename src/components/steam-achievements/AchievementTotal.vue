@@ -30,7 +30,7 @@ const total = computed(() => props.data?.playerstats.achievements?.length ?? 0);
   left: 4px;
   position: absolute;
   right: auto;
-  top: -2px;
+  top: -1px;
   z-index: 1000;
 }
 

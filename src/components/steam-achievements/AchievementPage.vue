@@ -2,9 +2,9 @@
 import type { Achievement } from '@/types/achievements';
 import type { SteamGameResponse, SteamPlayerStatsResponse } from '@/types/steam';
 import { ref, onMounted, computed } from 'vue';
-import AchievementTotal from '@/components/achievements/AchievementTotal.vue';
-import AchievementParameters from '@/components/achievements/AchievementParameters.vue';
-import AchievementElement from '@/components/achievements/AchievementElement.vue';
+import AchievementTotal from '@/components/steam-achievements/AchievementTotal.vue';
+import AchievementParameters from '@/components/steam-achievements/AchievementParameters.vue';
+import AchievementElement from '@/components/steam-achievements/AchievementElement.vue';
 import { getGameSchema, getPlayerAchievements, getUserGameStats } from '@/api/steam';
 
 const errors = ref<string[]>([]);
