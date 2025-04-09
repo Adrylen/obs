@@ -1,8 +1,11 @@
 import type { SteamGameResponse, SteamPlayerAchievementsInput, SteamPlayerStatsResponse, SteamSchemaForGameInput, SteamUserStatsForGameInput } from "@/types/steam";
 import axios from "axios";
 
+const baseUrl = (url: string) =>
+  process.env.NODE_ENV === 'production' ? url.replace(/^\/api/g, 'https://api.steampowered.com') : url;
+
 const getApi = (url: string, options: { [key: string]: string }) => axios.get(
-  `${url}?` + Object
+  `${baseUrl(url)}?` + Object
     .entries(options)
     .map(([key, value]) => `${key}=${value}`)
     .join('&')
@@ -14,7 +17,7 @@ export const getPlayerAchievements = async (
   try {
     const response = await getApi(
       '/api/ISteamUserStats/GetPlayerAchievements/v1',
-      { key, appid: appId, l: lang, steamid: steamId, },
+      { key, appId, l: lang, steamId, },
     );
 
     return response.data;
@@ -30,7 +33,7 @@ export const getGameSchema = async (
   try {
     const response = await getApi(
       '/api/ISteamUserStats/GetSchemaForGame/v2',
-      { key, appid: appId, l: lang, },
+      { key, appId, l: lang, },
     );
 
     return response.data;
@@ -46,7 +49,7 @@ export const getUserGameStats = async (
   try {
     const response = await getApi(
       '/api/ISteamUserStats/GetUserStatsForGame/v2',
-      { key, appid: appId, steamid: steamId, },
+      { key, appId, steamId, },
     );
 
     return response.data;
