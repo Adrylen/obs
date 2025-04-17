@@ -20,13 +20,13 @@ defineProps<{ data: Achievement; }>();
   font-size: 20px;
   grid-area: b;
   margin: 0;
-  padding: 24px 0 0 0;
+  padding: var(--steam-achievements-spacing) 0 0 0;
   width: 100%;
 }
 
 .achievement__title--hidden {
   color: transparent;
-  text-shadow: 0 0 8px white;
+  text-shadow: 0 0 var(--steam-achievements-shadow-m) white;
   font-weight: bold;
 }
 </style>

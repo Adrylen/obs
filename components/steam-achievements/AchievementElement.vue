@@ -20,15 +20,16 @@ defineProps<{ data: Achievement; visible: boolean; }>();
 <style scoped>
 .achievement {
   background-image: url(/images/raw_wood.jpg);
-  background-size: var(--image-size);
+  background-size: var(--steam-achievements-width);
   background-repeat: no-repeat;
-  height: calc(var(--image-size) / 4);
-  width: var(--image-size);
+  height: var(--steam-achievements-height);
+  width: var(--steam-achievements-width);
 
   display: grid;
   grid-template:
-    "a b" 58px
-    "a c" 58px / 116px 348px;
+    "a b" var(--steam-achievements-row-height)
+    "a c" var(--steam-achievements-row-height)
+    / var(--steam-achievements-column-image) var(--steam-achievements-column-text);
 
   position: absolute;
   transform: translateY(100%);

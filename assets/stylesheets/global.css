@@ -1,0 +1,12 @@
+:root {
+  --steam-achievements-width: 464px;
+  --steam-achievements-height: calc(var(--steam-achievements-width) / 4);
+  --steam-achievements-row-height: calc(var(--steam-achievements-height) / 2);
+  --steam-achievements-image: 64px;
+  --steam-achievements-column-image: calc(var(--steam-achievements-width) * 0.25);
+  --steam-achievements-column-text: calc(var(--steam-achievements-width) * 0.75);
+  --steam-achievements-spacing: 24px;
+  --steam-achievements-meta-offset: 4px;
+  --steam-achievements-shadow-m: 8px;
+  --steam-achievements-shadow-l: 12px;
+}

@@ -7,6 +7,6 @@ export type Achievement = {
   icongray: string;
   id: string | undefined;
   name: string;
-  unlocktime: number;
+  unlockTime: number;
   value: number | undefined;
 };

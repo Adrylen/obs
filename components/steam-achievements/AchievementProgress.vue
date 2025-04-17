@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Achievement } from '@/types/achievements';
 import { computed } from 'vue';
-import maxCount from "@/assets/maxCount.json";
+import maxCount from "@/assets/data/maxCount.json";
 import type { Json } from '@/types/utils';
 
 const props = defineProps<{ data: Achievement; }>();
@@ -26,7 +26,7 @@ const max = computed(() => props.data.id
 .achievement__progress {
   position: absolute;
   bottom: 8px;
-  left: 24px;
-  width: 66px;
+  left: var(--steam-achievements-spacing);
+  width: calc(var(--steam-achievements-image) + 2px);
 }
 </style>

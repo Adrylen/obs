@@ -2,7 +2,7 @@
 import type { SteamPlayerStatsResponse } from '@/types/steam';
 import { computed } from 'vue';
 
-const props = withDefaults(
+const { data, name, right } = withDefaults(
   defineProps<{
     data?: SteamPlayerStatsResponse;
     name?: string;
@@ -11,8 +11,8 @@ const props = withDefaults(
   { data: undefined, name: 'Total', right: false },
 );
 
-const amount = computed(() => props.data?.playerstats.achievements?.filter(({ achieved }) => achieved === 1).length ?? 0);
-const total = computed(() => props.data?.playerstats.achievements?.length ?? 0);
+const amount = computed(() => data?.playerstats.achievements?.filter(({ achieved }) => achieved === 1).length ?? 0);
+const total = computed(() => data?.playerstats.achievements?.length ?? 0);
 </script>
 
 <template>
@@ -27,7 +27,7 @@ const total = computed(() => props.data?.playerstats.achievements?.length ?? 0);
 <style scoped>
 .player-total {
   font-size: 12px;
-  left: 4px;
+  left: var(--steam-achievements-meta-offset);
   position: absolute;
   right: auto;
   top: -1px;
@@ -36,6 +36,6 @@ const total = computed(() => props.data?.playerstats.achievements?.length ?? 0);
 
 .right {
   left: auto;
-  right: calc(100% - var(--image-size) + 4px);
+  right: calc(100% - var(--steam-achievements-width) + var(--steam-achievements-meta-offset));
 }
 </style>

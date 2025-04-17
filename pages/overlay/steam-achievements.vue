@@ -5,39 +5,36 @@ import AchievementTotal from '@/components/steam-achievements/AchievementTotal.v
 import AchievementElement from '@/components/steam-achievements/AchievementElement.vue';
 
 const route = useRoute();
+const {
+  appId,
+  debug,
+  key,
+  lang,
+  otherId,
+  otherName,
+  steamId,
+  transition,
+} = useQueryParameters('steam-achievements', route.query);
+
+const queryParameters = joinQueryParameters({ appId, key, lang, steamId });
 
 const displayed = ref<number>(0);
-const debug = ref<boolean>(route.query.debug === "true");
-const otherId = ref(route.query.otherId ?? undefined);
-const otherName = ref<string | undefined>(route.query.otherName as string ?? undefined);
 
 const game = ref<SteamGameResponse>(undefined);
-const response = ref<SteamPlayerStatsResponse>(undefined);
-const stats = ref<SteamPlayerStatsResponse>(undefined);
-const otherStats = ref<SteamPlayerStatsResponse>(undefined);
+const playerAchievements = ref<SteamPlayerStatsResponse>(undefined);
+const otherAchievements = ref<SteamPlayerStatsResponse>(undefined);
+const playerStats = ref<SteamPlayerStatsResponse>(undefined);
 
-const queryParameters = (override: object = {}) => Object
-  .entries({
-    appId: route.query.appId ?? route.query.appid,
-    key: route.query.key,
-    lang: route.query.lang ?? route.query.l,
-    steamId: route.query.steamId ?? route.query.steamid,
-    ...override,
-  })
-  .filter(([_, value]) => !!value)
-  .map(([key, value]) => `${key}=${value}`)
-  .join('&');
+const loaded = computed(() => !!playerAchievements.value && !!playerStats.value && !!game.value);
 
-const loaded = computed(() => !!response.value && !!stats.value && !!game.value);
-
-const playerAchievements = computed(() => !loaded.value ? [] : game.value?.game
+const achievements = computed(() => !loaded.value ? [] : game.value?.game
   .availableGameStats.achievements
   .reduce<Array<Achievement>>((array, achievement) => {
-    const { achieved, apiname, unlocktime } = response.value
+    const { achieved, apiname, unlocktime } = playerAchievements.value
       ?.playerstats.achievements
       ?.find(({ apiname }) => apiname === achievement.name) ?? {};
 
-    const { value } = stats.value
+    const { value } = playerStats.value
       ?.playerstats.stats
       ?.find(({ name }) => name === `${achievement.name}_STAT`) ?? {};
 
@@ -47,46 +44,44 @@ const playerAchievements = computed(() => !loaded.value ? [] : game.value?.game
         ...achievement,
         id: apiname,
         achieved: achieved ?? 0,
-        unlocktime: unlocktime ?? 0,
+        unlockTime: unlocktime ?? 0,
         value,
       },
     ];
-  }, []) ?? []
+  }, []) ?? [],
 );
 
-$fetch<SteamPlayerStatsResponse>(`/api/steam/player/achievements?${queryParameters()}`)
-  .then((res) => response.value = res)
-  .catch(()=>{});
-$fetch<SteamPlayerStatsResponse>(`/api/steam/player/stats?${queryParameters()}`)
-  .then((res) => stats.value = res)
-  .catch(()=>{});
-$fetch<SteamGameResponse>(`/api/steam/game/schema?${queryParameters()}`)
-  .then((res) => game.value = res)
-  .catch(()=>{});
-
-if (!!otherId) {
-  $fetch<SteamPlayerStatsResponse>(`/api/steam/player/achievements?${queryParameters({ steamId: otherId.value })}`)
-  .then((res) => otherStats.value = res)
-  .catch(()=>{});
-}
-
 onMounted(() => {
+  Promise.all([
+    useSteamFetch<SteamGameResponse>(`/api/steam/game/schema?${queryParameters()}`),
+    useSteamFetch<SteamPlayerStatsResponse>(`/api/steam/player/achievements?${queryParameters()}`),
+    useSteamFetch<SteamPlayerStatsResponse>(`/api/steam/player/stats?${queryParameters()}`),
+    ...(!otherId ? [] : [
+      useSteamFetch<SteamPlayerStatsResponse>(`/api/steam/player/achievements?${queryParameters({ steamId: otherId })}`)
+    ]),
+  ]).then(([gameResponse, playerAchievementsResponse, playerStatsResponse, otherAchievementsResponse]) => {
+    game.value = gameResponse;
+    playerAchievements.value = playerAchievementsResponse;
+    playerStats.value = playerStatsResponse;
+    otherAchievements.value = otherAchievementsResponse;
+  });
+
   setInterval(() => {
-    displayed.value = (displayed.value + 1) % (playerAchievements.value.length || 1);
-  }, +(route.query.t ?? 0) || 10000);
+    displayed.value = (displayed.value + 1) % (achievements.value.length || 1);
+  }, transition);
 });
 </script>
 
 <template>
   <section v-if="loaded" class="achievements">
-    <AchievementTotal :data="response" />
+    <AchievementTotal :data="playerAchievements" />
     <AchievementTotal
       right
-      :data="otherStats"
+      :data="otherAchievements"
       :name="otherName"
     />
     <AchievementElement
-      v-for="(achievement, index) in playerAchievements"
+      v-for="(achievement, index) in achievements"
       :key="index"
       :data="achievement"
       :visible="displayed >= index"
@@ -95,15 +90,15 @@ onMounted(() => {
   <template v-if="debug">
     <details>
       <summary>Player achievements</summary>
-      <pre v-if="response">{{ JSON.stringify(response, null, 2) }}</pre>
+      <pre v-if="playerAchievements">{{ JSON.stringify(playerAchievements, null, 2) }}</pre>
     </details>
     <details>
       <summary>Player stats</summary>
-      <pre v-if="stats">{{ JSON.stringify(stats, null, 2) }}</pre>
+      <pre v-if="playerStats">{{ JSON.stringify(playerStats, null, 2) }}</pre>
     </details>
     <details v-if="otherId">
       <summary>Other player stats</summary>
-      <pre v-if="otherStats">{{ JSON.stringify(otherStats, null, 2) }}</pre>
+      <pre v-if="otherAchievements">{{ JSON.stringify(otherAchievements, null, 2) }}</pre>
     </details>
     <details>
       <summary>Game data</summary>
@@ -112,19 +107,13 @@ onMounted(() => {
   </template>
 </template>
 
-<style>
-:root {
-  --image-size: 464px;
-}
-</style>
-
 <style scoped>
 @import url('https://fonts.cdnfonts.com/css/fira-sans-extra-condensed');
 
 .achievements {
   color: white;
   font-family: 'Fira Sans Extra Condensed', sans-serif;
-  height: 116px;
+  height: var(--steam-achievements-height);
   overflow: hidden;
   position: relative;
 }

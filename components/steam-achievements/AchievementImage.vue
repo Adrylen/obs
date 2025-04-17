@@ -20,15 +20,15 @@ defineProps<{ data: Achievement; }>();
 <style scoped>
 .achievement__image {
   grid-area: a;
-  margin-block: 24px;
-  margin-inline: 24px;
+  margin: var(--steam-achievements-spacing);
   border-width: 2px;
   border-style: ridge;
   border-color: white;
+  width: var(--steam-achievements-image);
 }
 
 .achievement__image--hidden {
-  box-shadow: 0 0 12px gold;
+  box-shadow: 0 0 var(--steam-achievements-shadow-l) gold;
 }
 
 .achievement__image--todo {
