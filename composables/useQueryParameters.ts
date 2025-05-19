@@ -2,7 +2,10 @@ import type { LocationQuery } from "vue-router";
 
 const STEAM_ACHIEVEMENTS_DEFAULT_TRANSITION = 10000;
 
-type Overlay = 'steam-achievements' | undefined;
+type Overlay = 
+  | 'obs-title'
+  | 'steam-achievements'
+  | undefined;
 
 export default function (overlay: Overlay, query: LocationQuery) {
   // All available properties
@@ -14,7 +17,7 @@ export default function (overlay: Overlay, query: LocationQuery) {
     oi, otherId,
     on, otherName,
     s, steamId, steamid,
-    t, transition,
+    t, transition, title,
   } = query;
 
   switch(overlay) {
@@ -29,6 +32,10 @@ export default function (overlay: Overlay, query: LocationQuery) {
         otherId: (otherId ?? oi) as string | undefined,
         otherName: (otherName ?? on) as string | undefined,
         transition: +(transition ?? t ?? 0) || STEAM_ACHIEVEMENTS_DEFAULT_TRANSITION,
+      };
+    case 'obs-title':
+      return {
+        title: (title ?? t) as string | undefined,
       };
     default:
       return {};
