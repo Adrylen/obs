@@ -5,13 +5,14 @@ const STEAM_ACHIEVEMENTS_DEFAULT_TRANSITION = 10000;
 type Overlay = 
   | 'obs-title'
   | 'steam-achievements'
+  | 'zevent-cagnotte'
   | undefined;
 
 export default function (overlay: Overlay, query: LocationQuery) {
   // All available properties
   const {
     a, appId, appid,
-    d, debug,
+    d, debug, delay,
     k, key,
     l, lang,
     oi, otherId,
@@ -36,6 +37,10 @@ export default function (overlay: Overlay, query: LocationQuery) {
     case 'obs-title':
       return {
         title: (title ?? t) as string | undefined,
+      };
+    case 'zevent-cagnotte':
+      return {
+        delay: Number((delay ?? d) as string | undefined) || 0,
       };
     default:
       return {};
