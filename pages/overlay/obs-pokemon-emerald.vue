@@ -5,11 +5,12 @@ type Pokemon = {
 };
 
 const route = useRoute();
-const { p1, p2 } = useQueryParameters('pokemon-emerald', route.query);
+const { badges, p1, p2 } = useQueryParameters('pokemon-emerald', route.query);
 
 const player1Team = ref<Array<Pokemon | undefined>>(Array.from({ length: 6 }));
 const player2Team = ref<Array<Pokemon | undefined>>(Array.from({ length: 6 }));
 
+const gyms = computed(() => badges ?? 0);
 const loadPokemon = (id?: string) => $fetch<Pokemon | undefined>(`/api/pokeapi/pokemon?id=${id ?? ""}`)
 
 onMounted(async () => {
@@ -49,6 +50,23 @@ onMounted(async () => {
     <img class="logo" src="https://www.pokebip.com/pages/jeuxvideo/logos/emeraude.png">
     <img class="logo-ball" src="https://www.pokepedia.fr/images/a/a7/Miniature_Faiblo_Ball_LPZA.png?20251015154731">
     <p class="logo-text">20 ans</p>
+    <div class="gyms">
+      <div class="badges">
+        <img :class="gyms < 1 ? 'masked' : undefined" height="48" src="https://www.pokepedia.fr/images/3/32/Badge_Roche_Hoenn_ROSA.png">
+        <img :class="gyms < 2 ? 'masked' : undefined" height="48" src="https://www.pokepedia.fr/images/e/e0/Badge_Poing_Hoenn_ROSA.png">
+        <img :class="gyms < 3 ? 'masked' : undefined" height="48" src="https://www.pokepedia.fr/images/6/67/Badge_Dynamo_Hoenn_ROSA.png">
+        <img :class="gyms < 4 ? 'masked' : undefined" height="48" src="https://www.pokepedia.fr/images/3/39/Badge_Chaleur_Hoenn_ROSA.png">
+        <img :class="gyms < 5 ? 'masked' : undefined" height="48" src="https://www.pokepedia.fr/images/5/59/Badge_Balancier_Hoenn_ROSA.png">
+        <img :class="gyms < 6 ? 'masked' : undefined" height="48" src="https://www.pokepedia.fr/images/4/42/Badge_Plume_Hoenn_ROSA.png">
+        <img :class="gyms < 7 ? 'masked' : undefined" height="48" src="https://www.pokepedia.fr/images/6/66/Badge_Esprit_Hoenn_ROSA.png">
+        <img :class="gyms < 8 ? 'masked' : undefined" height="48" src="https://www.pokepedia.fr/images/3/3f/Badge_Pluie_Hoenn_ROSA.png">
+      </div>
+      <img :class="gyms < 9 ? 'masked' : undefined" src="https://www.pokepedia.fr/images/9/9c/Sprite_Damien_RS.png">
+      <img :class="gyms < 10 ? 'masked' : undefined" src="https://www.pokepedia.fr/images/b/b8/Sprite_Spectra_RS.png">
+      <img :class="gyms < 11 ? 'masked' : undefined" src="https://www.pokepedia.fr/images/4/44/Sprite_Glacia_RS.png">
+      <img :class="gyms < 12 ? 'masked' : undefined" src="https://www.pokepedia.fr/images/2/2f/Sprite_Aragon_RS.png">
+      <img :class="gyms < 13 ? 'masked' : undefined" src="https://www.pokepedia.fr/images/8/8b/Sprite_Marc_E.png">
+    </div>
   </div>
 </template>
 
@@ -59,9 +77,17 @@ onMounted(async () => {
 }
 .background {
   position: relative;
-  background: linear-gradient(to bottom right, #6e9c6d, #9bd285, #b5ff87);
   height: 1080px;
   width: 1920px;
+}
+.background::before {
+  content: '';
+  position: absolute;
+  background: url('https://www.pngplay.com/wp-content/uploads/11/Rayquaza-Pokemon-Transparent-Images.png') no-repeat right center, linear-gradient(to bottom left, #6e9c6d, #9bd285, #b5ff87);
+  background-blend-mode: luminosity;
+  transform: scaleX(-1);
+  height: 100%;
+  width: 100%;
 }
 .logo {
   position: absolute;
@@ -160,5 +186,20 @@ onMounted(async () => {
   top: 16px;
   right: -24px;
   z-index: 10;
+}
+.gyms {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  right: 200px;
+  bottom: 28px;
+}
+.badges {
+  display: flex;
+  gap: 16px;
+  margin-right: 32px;
+}
+.masked {
+  filter: brightness(0);
 }
 </style>

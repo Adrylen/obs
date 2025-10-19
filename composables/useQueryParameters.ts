@@ -13,6 +13,7 @@ export default function (overlay: Overlay, query: LocationQuery) {
   // All available properties
   const {
     a, appId, appid,
+    b, badges,
     d, debug, delay,
     k, key,
     l, lang,
@@ -31,6 +32,7 @@ export default function (overlay: Overlay, query: LocationQuery) {
       };
     case 'pokemon-emerald':
       return {
+        badges: Number((badges ?? b) as string | undefined) || 0,
         p1: (player1 ?? p1 ?? "") as string | undefined,
         p2: (player2 ?? p2 ?? "") as string | undefined,
       };
