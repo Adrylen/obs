@@ -3,6 +3,7 @@ import type { LocationQuery } from "vue-router";
 const STEAM_ACHIEVEMENTS_DEFAULT_TRANSITION = 10000;
 
 type Overlay = 
+  | 'pokemon-emerald'
   | 'obs-title'
   | 'steam-achievements'
   | 'zevent-cagnotte'
@@ -17,12 +18,22 @@ export default function (overlay: Overlay, query: LocationQuery) {
     l, lang,
     oi, otherId,
     on, otherName,
+    p1, player1,
+    p2, player2,
     s, steamId, steamid,
     t, transition, title,
   } = query;
 
   switch(overlay) {
-    /* Steam Achievements Overlay */
+    case 'obs-title':
+      return {
+        title: (title ?? t) as string | undefined,
+      };
+    case 'pokemon-emerald':
+      return {
+        p1: (player1 ?? p1 ?? "") as string | undefined,
+        p2: (player2 ?? p2 ?? "") as string | undefined,
+      };
     case 'steam-achievements':
       return {
         appId: (appId ?? appid ?? a) as string | undefined,
@@ -33,10 +44,6 @@ export default function (overlay: Overlay, query: LocationQuery) {
         otherId: (otherId ?? oi) as string | undefined,
         otherName: (otherName ?? on) as string | undefined,
         transition: +(transition ?? t ?? 0) || STEAM_ACHIEVEMENTS_DEFAULT_TRANSITION,
-      };
-    case 'obs-title':
-      return {
-        title: (title ?? t) as string | undefined,
       };
     case 'zevent-cagnotte':
       return {

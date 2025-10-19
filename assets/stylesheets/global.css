@@ -10,3 +10,15 @@
   --steam-achievements-shadow-m: 8px;
   --steam-achievements-shadow-l: 12px;
 }
+
+:root {
+  --game-top-offset: 160px;
+  --game-right-offset: 60px;
+  --game-border-width: 8px;
+  --game-right-full-offset: calc(var(--game-right-offset) + var(--game-border-width));
+  --game-height: 800px;
+  --game-width: 1200px;
+  --logo-width: 320px;
+  --logo-ball-width: 160px;
+  --logo-text-width: 240px;
+}
